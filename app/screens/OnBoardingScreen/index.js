@@ -7,6 +7,7 @@ import {
     StatusBar,
     TouchableOpacity,
     Dimensions,
+    StyleSheet,
 } from 'react-native';
 import { moderateScale } from 'react-native-size-matters';
 import Feather from 'react-native-vector-icons/Feather';
@@ -74,50 +75,21 @@ export const OnBoardingScreen = () => {
     };
 
     const renderItem = ({ item }) => (
-        <View style={{
-            width,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: moderateScale(30),
-        }}>
-            <Image source={item.image} style={{
-                width: width * 0.9,
-                height: moderateScale(290),
-            }} />
-            <Text style={{
-                fontSize: moderateScale(22),
-                fontWeight: 'bold',
-                marginTop: moderateScale(40),
-                color: COLORS.primary,
-                textAlign: 'center'
-            }}>{item.title}</Text>
-            <Text style={{
-                fontSize: moderateScale(12),
-                textAlign: 'center',
-                marginTop: moderateScale(20),
-                color: COLORS.black
-            }}>{item.description}</Text>
+        <View style={styles.slide}>
+            <Image source={item.image} style={styles.image} />
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.description}>{item.description}</Text>
         </View>
     );
 
     return (
-        <View style={{
-            flex: 1,
-            justifyContent: 'center',
-            backgroundColor: COLORS.white
-        }}>
+        <View style={styles.container}>
             <StatusBar barStyle="dark-content" />
-            <View
-                style={{
-                    flex: 0.8
-                }}
-            >
+            <View style={styles.topSection}>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('welcomeScreen')}
-                    style={{
-                        alignSelf: 'flex-end',
-                        marginRight: moderateScale(20),
-                    }}>
+                    style={styles.skipButton}
+                >
                     <Feather name="user" size={moderateScale(25)} color={COLORS.black} />
                 </TouchableOpacity>
                 <FlatList
@@ -130,52 +102,99 @@ export const OnBoardingScreen = () => {
                     onScroll={handleScroll}
                     renderItem={renderItem}
                 />
-
-                {/* Pagination Dots */}
-                <View style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                }}>
+                <View style={styles.pagination}>
                     {slides.map((_, index) => (
                         <View
                             key={index}
-                            style={{
-                                width: 8,
-                                height: 8,
-                                borderRadius: 4,
-                                margin: 5,
-                                backgroundColor: currentIndex === index ? COLORS.primary : COLORS.gray,
-                            }}
+                            style={[
+                                styles.dot,
+                                currentIndex === index && styles.activeDot,
+                            ]}
                         />
                     ))}
                 </View>
             </View>
 
-            <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: "center",
-                marginTop: moderateScale(40),
-                marginHorizontal: moderateScale(20),
-            }}>
+            <View style={styles.buttonContainer}>
                 <CustomButton
-                    disabled={currentIndex == 0}
-                    title={'Back'}
+                    disabled={currentIndex === 0}
+                    title="Back"
                     outline
                     onPress={handleBack}
-                    buttonStyle={{
-                        width: moderateScale(100),
-                    }}
+                    buttonStyle={styles.backButton}
                 />
                 <CustomButton
-                    disabled={currentIndex == slides.length - 1}
-                    title={'Next'}
+                    disabled={currentIndex === slides.length - 1}
+                    title="Next"
                     onPress={handleNext}
-                    buttonStyle={{
-                        width: moderateScale(120),
-                    }}
+                    buttonStyle={styles.nextButton}
                 />
             </View>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        backgroundColor: COLORS.white,
+    },
+    topSection: {
+        flex: 0.8,
+    },
+    skipButton: {
+        alignSelf: 'flex-end',
+        marginRight: moderateScale(20),
+    },
+    slide: {
+        width,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: moderateScale(30),
+    },
+    image: {
+        width: width * 0.9,
+        height: moderateScale(290),
+    },
+    title: {
+        fontSize: moderateScale(22),
+        fontWeight: 'bold',
+        marginTop: moderateScale(40),
+        color: COLORS.primary,
+        textAlign: 'center',
+    },
+    description: {
+        fontSize: moderateScale(12),
+        textAlign: 'center',
+        marginTop: moderateScale(20),
+        color: COLORS.black,
+    },
+    pagination: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    dot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        margin: 5,
+        backgroundColor: COLORS.gray,
+    },
+    activeDot: {
+        backgroundColor: COLORS.primary,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: moderateScale(40),
+        marginHorizontal: moderateScale(20),
+    },
+    backButton: {
+        width: moderateScale(100),
+    },
+    nextButton: {
+        width: moderateScale(120),
+    },
+});

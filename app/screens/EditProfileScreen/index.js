@@ -1,4 +1,10 @@
-import { View, Text, ScrollView, Alert } from 'react-native';
+import {
+    View,
+    Text,
+    ScrollView,
+    Alert,
+    StyleSheet,
+} from 'react-native';
 import React from 'react';
 import { COLORS } from '../../theme/Colors';
 import { CustomTextInput } from '../../components/customInput';
@@ -29,7 +35,6 @@ export const EditProfileScreen = ({ route, navigation }) => {
             phone,
             address,
         };
-        // Dispatch to redux store
         await dispatch(signupUser(updatedUser));
         Alert.alert('Success', 'Profile updated successfully', [
             {
@@ -42,15 +47,8 @@ export const EditProfileScreen = ({ route, navigation }) => {
     return (
         <ScrollView
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{
-                flexGrow: 1,
-                paddingHorizontal: moderateScale(15),
-                paddingVertical: moderateScale(10),
-            }}
-            style={{
-                flex: 1,
-                backgroundColor: COLORS.white,
-            }}
+            contentContainerStyle={styles.container}
+            style={styles.scrollView}
         >
             <Text style={styles.label}>Name:</Text>
             <CustomTextInput
@@ -83,24 +81,28 @@ export const EditProfileScreen = ({ route, navigation }) => {
                 multiline
                 value={address}
                 onChangeText={setAddress}
-                inputStyle={[styles.input, {
-                    height: moderateScale(80),
-                    textAlignVertical: 'top'
-                }]}
+                inputStyle={[styles.input, styles.addressInput]}
             />
 
             <CustomButton
                 title="Update Profile"
-                onPress={() => handleUpdateProfile()}
-                buttonStyle={{
-                    marginTop: moderateScale(20),
-                }}
+                onPress={handleUpdateProfile}
+                buttonStyle={styles.button}
             />
         </ScrollView>
     );
 };
 
-const styles = {
+const styles = StyleSheet.create({
+    scrollView: {
+        flex: 1,
+        backgroundColor: COLORS.white,
+    },
+    container: {
+        flexGrow: 1,
+        paddingHorizontal: moderateScale(15),
+        paddingVertical: moderateScale(10),
+    },
     label: {
         fontSize: moderateScale(15),
         fontWeight: '500',
@@ -110,4 +112,11 @@ const styles = {
     input: {
         marginTop: moderateScale(6),
     },
-};
+    addressInput: {
+        height: moderateScale(80),
+        textAlignVertical: 'top',
+    },
+    button: {
+        marginTop: moderateScale(20),
+    },
+});

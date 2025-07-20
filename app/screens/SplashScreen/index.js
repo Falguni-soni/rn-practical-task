@@ -6,6 +6,7 @@ import {
     Easing,
     Text,
     StatusBar,
+    StyleSheet,
 } from 'react-native';
 import { moderateScale } from 'react-native-size-matters';
 import { COLORS } from '../../theme/Colors';
@@ -14,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 export const SplashScreen = () => {
     const navigation = useNavigation();
 
+    // Animated values for image and text
     const scaleAnim = useRef(new Animated.Value(0)).current;
     const slideAnim = useRef(new Animated.Value(30)).current;
     const textOpacity = useRef(new Animated.Value(0)).current;
@@ -51,37 +53,51 @@ export const SplashScreen = () => {
     }, []);
 
     return (
-        <View style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: COLORS.white
-        }}>
+        <View style={styles.container}>
             <StatusBar barStyle={'dark-content'} />
             <Animated.Image
                 source={require('../../assets/logo.png')}
-                style={{
-                    width: moderateScale(200),
-                    height: moderateScale(200),
-                    transform: [
-                        { scale: scaleAnim },
-                        { translateY: slideAnim }
-                    ]
-                }}
+                style={[
+                    styles.logo,
+                    {
+                        transform: [
+                            { scale: scaleAnim },
+                            { translateY: slideAnim },
+                        ],
+                    },
+                ]}
                 resizeMode="contain"
             />
             <Animated.Text
-                style={{
-                    fontSize: moderateScale(24),
-                    fontWeight: 'bold',
-                    color: COLORS.primary,
-                    marginTop: moderateScale(20),
-                    opacity: textOpacity,
-                    transform: [{ translateY: textTranslateY }]
-                }}
+                style={[
+                    styles.title,
+                    {
+                        opacity: textOpacity,
+                        transform: [{ translateY: textTranslateY }],
+                    },
+                ]}
             >
                 UpTasker
             </Animated.Text>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: COLORS.white,
+    },
+    logo: {
+        width: moderateScale(200),
+        height: moderateScale(200),
+    },
+    title: {
+        fontSize: moderateScale(24),
+        fontWeight: 'bold',
+        color: COLORS.primary,
+        marginTop: moderateScale(20),
+    },
+});

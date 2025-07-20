@@ -10,7 +10,8 @@ import {
     KeyboardAvoidingView,
     Platform,
     Keyboard,
-    Alert
+    Alert,
+    StyleSheet,
 } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import { COLORS } from '../../theme/Colors';
@@ -19,7 +20,7 @@ import { CustomTextInput } from '../../components/customInput';
 import { CustomButton } from '../../components/customButton';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
-import { setUserData, signupUser } from '../../redux/actions/AuthAction';
+import { signupUser } from '../../redux/actions/AuthAction';
 
 export const SignUpScreen = () => {
     const navigation = useNavigation();
@@ -35,16 +36,17 @@ export const SignUpScreen = () => {
     const [keyboardOpen, setKeyboardOpen] = useState(false);
     const [errors, setErrors] = useState({});
 
+    // Handle keyboard open/close detection
     useEffect(() => {
         const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardOpen(true));
         const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardOpen(false));
-
         return () => {
             showSub.remove();
             hideSub.remove();
         };
     }, []);
 
+    // Spin animation
     useEffect(() => {
         Animated.loop(
             Animated.timing(spinValue, {
@@ -61,6 +63,7 @@ export const SignUpScreen = () => {
         outputRange: ['0deg', '360deg'],
     });
 
+    // Form validation and signup logic
     const onSubmit = async () => {
         try {
             const newErrors = {};
@@ -95,16 +98,14 @@ export const SignUpScreen = () => {
             setErrors(newErrors);
 
             if (Object.keys(newErrors).length === 0) {
-                const data = {
-                    name, email, phone, address, password
-                }
+                const data = { name, email, phone, address, password };
                 await dispatch(signupUser(data));
-                setAddress('')
-                setName('')
-                setEmail('')
-                setPhone('')
-                setPassword('')
-                setConfirmPassword('')
+                setName('');
+                setEmail('');
+                setPhone('');
+                setAddress('');
+                setPassword('');
+                setConfirmPassword('');
                 Alert.alert('Success', 'User Created successfully', [
                     {
                         text: 'OK',
@@ -113,188 +114,116 @@ export const SignUpScreen = () => {
                 ]);
             }
         } catch (error) {
-
         }
-
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: COLORS.white }}>
+        <View style={styles.container}>
             <StatusBar barStyle={'dark-content'} />
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={{ flex: 1 }}
+                style={styles.keyboardAvoiding}
                 enabled={keyboardOpen}
             >
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={{
-                        flexGrow: 1,
-                        justifyContent: 'center',
-                        paddingBottom: moderateScale(50),
-                        marginTop: moderateScale(30),
-                    }}
+                    contentContainerStyle={styles.scrollViewContainer}
                 >
                     <Animated.Image
                         source={require('../../assets/logo.png')}
-                        style={{
-                            width: moderateScale(100),
-                            height: moderateScale(100),
-                            alignSelf: 'center',
-                            marginBottom: moderateScale(15),
-                            transform: [{ rotate: spin }],
-                            borderRadius: moderateScale(50),
-                        }}
+                        style={[
+                            styles.logo,
+                            {
+                                transform: [{ rotate: spin }],
+                            },
+                        ]}
+                        resizeMode="contain"
                     />
-                    <Text
-                        style={{
-                            fontSize: moderateScale(24),
-                            fontWeight: 'bold',
-                            textAlign: 'center',
-                            color: '#1F41BB',
-                        }}
-                    >
-                        Create Account
-                    </Text>
 
-                    <View
-                        style={{
-                            marginTop: moderateScale(30),
-                            marginHorizontal: moderateScale(12),
-                        }}
-                    >
+                    <Text style={styles.headerText}>Create Account</Text>
+
+                    <View style={styles.formContainer}>
                         <CustomTextInput
                             placeholder="Enter Name"
                             value={name}
                             onChangeText={(text) => {
-                                setName(text)
-                                setErrors((prev) => ({ ...prev, name: '' }))
+                                setName(text);
+                                setErrors((prev) => ({ ...prev, name: '' }));
                             }}
-
                         />
-                        {errors.name &&
-                            <Text style={{
-                                color: 'red',
-                                fontSize: moderateScale(12),
-                                fontWeight: '400',
-                            }}>{errors.name}</Text>}
+                        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
                         <CustomTextInput
                             placeholder="Enter Email"
                             value={email}
                             onChangeText={(text) => {
-                                setEmail(text)
-                                setErrors((prev) => ({ ...prev, email: '' }))
+                                setEmail(text);
+                                setErrors((prev) => ({ ...prev, email: '' }));
                             }}
-                            inputStyle={{
-                                marginTop: moderateScale(12),
-                            }}
+                            inputStyle={styles.inputSpacing}
                         />
-                        {errors.email && <Text
-                            style={{
-                                color: 'red',
-                                fontSize: moderateScale(12),
-                                fontWeight: '400',
-                            }}>{errors.email}</Text>}
+                        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
                         <CustomTextInput
                             placeholder="Enter Phone Number"
                             value={phone}
                             keyboardType={'phone-pad'}
                             onChangeText={(text) => {
-                                setPhone(text)
-                                setErrors((prev) => ({ ...prev, phone: '' }))
+                                setPhone(text);
+                                setErrors((prev) => ({ ...prev, phone: '' }));
                             }}
                             maxLength={10}
-                            inputStyle={{
-                                marginTop: moderateScale(12),
-                            }}
+                            inputStyle={styles.inputSpacing}
                         />
-                        {errors.phone && <Text style={{
-                            color: 'red',
-                            fontSize: moderateScale(12),
-                            fontWeight: '400',
-                        }}>{errors.phone}</Text>}
+                        {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
 
                         <CustomTextInput
                             placeholder="Enter Address"
                             multiline
                             value={address}
                             onChangeText={(text) => {
-                                setAddress(text)
-                                setErrors((prev) => ({ ...prev, address: '' }))
+                                setAddress(text);
+                                setErrors((prev) => ({ ...prev, address: '' }));
                             }}
-                            inputStyle={{
-                                marginTop: moderateScale(12),
-                                height: moderateScale(80),
-                                textAlignVertical: 'top',
-                            }}
+                            inputStyle={styles.addressInput}
                         />
-                        {errors.address && <Text style={{
-                            color: 'red',
-                            fontSize: moderateScale(12),
-                            fontWeight: '400',
-                        }}>{errors.address}</Text>}
+                        {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
 
                         <CustomTextInput
                             placeholder="Enter Password"
                             value={password}
                             onChangeText={(text) => {
-                                setPassword(text)
-                                setErrors((prev) => ({ ...prev, password: '' }))
+                                setPassword(text);
+                                setErrors((prev) => ({ ...prev, password: '' }));
                             }}
-                            inputStyle={{
-                                marginTop: moderateScale(12),
-                            }}
+                            inputStyle={styles.inputSpacing}
                             secureTextEntry
                         />
-                        {errors.password && <Text style={{
-                            color: 'red',
-                            fontSize: moderateScale(12),
-                            fontWeight: '400',
-                        }}>{errors.password}</Text>}
+                        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
                         <CustomTextInput
                             placeholder="Confirm Password"
                             value={confirmPassword}
                             onChangeText={(text) => {
-                                setConfirmPassword(text)
-                                setErrors((prev) => ({ ...prev, confirmPassword: '' }))
+                                setConfirmPassword(text);
+                                setErrors((prev) => ({ ...prev, confirmPassword: '' }));
                             }}
+                            inputStyle={styles.inputSpacing}
                             secureTextEntry
-                            inputStyle={{
-                                marginTop: moderateScale(12),
-                            }}
                         />
                         {errors.confirmPassword && (
-                            <Text style={{
-                                color: 'red',
-                                fontSize: moderateScale(12),
-                                fontWeight: '400',
-                            }}>{errors.confirmPassword}</Text>
+                            <Text style={styles.errorText}>{errors.confirmPassword}</Text>
                         )}
+
                         <CustomButton
                             title={'Sign up'}
-                            buttonStyle={{
-                                marginTop: moderateScale(30),
-                            }}
-                            onPress={() => onSubmit()}
+                            buttonStyle={styles.signUpButton}
+                            onPress={onSubmit}
                         />
 
-                        <TouchableOpacity
-                            onPress={() => {
-                                navigation.navigate('loginScreen');
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontSize: moderateScale(14),
-                                    color: '#1F41BB',
-                                    textAlign: 'center',
-                                    marginTop: moderateScale(20),
-                                }}
-                            >
+                        <TouchableOpacity onPress={() => navigation.navigate('loginScreen')}>
+                            <Text style={styles.alreadyAccountText}>
                                 Already have an account
                             </Text>
                         </TouchableOpacity>
@@ -304,3 +233,58 @@ export const SignUpScreen = () => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: COLORS.white,
+    },
+    keyboardAvoiding: {
+        flex: 1,
+    },
+    scrollViewContainer: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        paddingBottom: moderateScale(50),
+        marginTop: moderateScale(30),
+    },
+    logo: {
+        width: moderateScale(100),
+        height: moderateScale(100),
+        alignSelf: 'center',
+        marginBottom: moderateScale(15),
+        borderRadius: moderateScale(50),
+    },
+    headerText: {
+        fontSize: moderateScale(24),
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#1F41BB',
+    },
+    formContainer: {
+        marginTop: moderateScale(30),
+        marginHorizontal: moderateScale(12),
+    },
+    inputSpacing: {
+        marginTop: moderateScale(12),
+    },
+    addressInput: {
+        marginTop: moderateScale(12),
+        height: moderateScale(80),
+        textAlignVertical: 'top',
+    },
+    errorText: {
+        color: 'red',
+        fontSize: moderateScale(12),
+        fontWeight: '400',
+    },
+    signUpButton: {
+        marginTop: moderateScale(30),
+    },
+    alreadyAccountText: {
+        fontSize: moderateScale(14),
+        color: '#1F41BB',
+        textAlign: 'center',
+        marginTop: moderateScale(20),
+    },
+});
